@@ -1,0 +1,21 @@
+Iteration 1: Best path length so far: 32.180221
+Iteration 2: Best path length so far: 18.772202
+Iteration 3: Best path length so far: 18.772202
+Iteration 4: Best path length so far: 18.772202
+Iteration 5: Best path length so far: 16.926999
+Iteration 6: Best path length so far: 15.629699
+Iteration 7: Best path length so far: 15.629699
+Iteration 8: Best path length so far: 15.629699
+Iteration 9: Best path length so far: 15.629699
+Iteration 10: Best path length so far: 15.6509
+
+Final best path length: 15.6509
+
+Best path with weights:
+0 -> 2   (1.26)
+2 -> 3   (1.41)
+3 -> 6   (2.99)
+6 -> 5   (1.69)
+5 -> 4   (1.22)
+4 -> 1   (4.07)
+1 -> 0   (3.19)
