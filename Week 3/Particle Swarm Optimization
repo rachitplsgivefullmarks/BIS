@@ -1,0 +1,69 @@
+#Application: Feature Selection in ML & DS
+import random
+import numpy as np
+
+# Number of total features in the dataset
+NUM_FEATURES = 30  
+
+# Simulated accuracy evaluation function
+def evaluate_subset(bitstring):
+    # accuracy = random baseline + reward for number of 1s near 6
+    selected = sum(bitstring)
+    accuracy = 0.80 + (-(abs(selected - 6)) * 0.01)  
+    accuracy += random.uniform(-0.01, 0.01)  # noise
+    return round(max(min(accuracy, 1.0), 0.0), 2)
+
+# Particle Swarm Optimization parameters
+NUM_PARTICLES = 20
+MAX_ITER = 30
+W = 0.7    # inertia
+C1 = 1.5   # cognitive
+C2 = 1.5   # social
+
+# Initialize particles
+particles = [np.random.randint(0, 2, NUM_FEATURES).astype(int) for _ in range(NUM_PARTICLES)]
+vel = [np.zeros(NUM_FEATURES) for _ in range(NUM_PARTICLES)]
+
+pbest = particles.copy()
+pbest_acc = [evaluate_subset(p) for p in particles]
+
+gbest = pbest[np.argmax(pbest_acc)]
+gbest_acc = max(pbest_acc)
+
+# MAIN LOOP
+for it in range(1, MAX_ITER + 1):
+
+    for i in range(NUM_PARTICLES):
+        # Velocity update
+        r1, r2 = random.random(), random.random()
+        vel[i] = (W * vel[i] 
+                  + C1 * r1 * (pbest[i] - particles[i]) 
+                  + C2 * r2 * (gbest - particles[i]))
+
+        # Sigmoid to convert velocity to probability
+        prob = 1 / (1 + np.exp(-vel[i]))
+
+        # Update particle positions
+        particles[i] = np.array([1 if random.random() < prob[j] else 0 
+                                 for j in range(NUM_FEATURES)])
+
+        # Evaluate new position
+        acc = evaluate_subset(particles[i])
+
+        if acc > pbest_acc[i]:
+            pbest[i] = particles[i].copy()
+            pbest_acc[i] = acc
+
+    # Update global best
+    best_particle_index = np.argmax(pbest_acc)
+    if pbest_acc[best_particle_index] > gbest_acc:
+        gbest_acc = pbest_acc[best_particle_index]
+        gbest = pbest[best_particle_index].copy()
+
+    # PRINT OUTPUT LIKE YOUR NOTEBOOK
+    if it in [1, 10, 20, 30]:
+        print(f"Iteration {it}/30 - Best Accuracy: {gbest_acc} - Selected Features: {sum(gbest)}")
+
+# Final Result
+print("\nBest subset:", gbest.tolist())
+print("Features selected:", sum(gbest))
