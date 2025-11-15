@@ -1,0 +1,90 @@
+#Application:Sequence of Induction & Creation of Constants
+
+import random
+
+# Allowed terminals and operators
+TERMINALS = ["X"]
+OPERATORS = ["+", "-", "*", "/"]
+
+def random_constant():
+    return round(random.uniform(0, 10), 6)
+
+def create_initial_expression():
+    # Format: [X, constant, constant, operator, operator]
+    return ["X", 3.0, 7.0, "+"]
+
+def mutate_expression(expr):
+    expr = expr[:]  # copy
+
+    # Choose a mutation type
+    mutation_type = random.choice(["constant", "operator", "insert_constant"])
+
+    if mutation_type == "constant":
+        # Replace a constant
+        idxs = [i for i, x in enumerate(expr) if isinstance(x, float)]
+        if idxs:
+            pos = random.choice(idxs)
+            expr[pos] = random_constant()
+
+    elif mutation_type == "operator":
+        # Replace an operator
+        idxs = [i for i, x in enumerate(expr) if x in OPERATORS]
+        if idxs:
+            pos = random.choice(idxs)
+            expr[pos] = random.choice(OPERATORS)
+
+    elif mutation_type == "insert_constant":
+        # Insert a new constant before the last operator
+        expr.insert(2, random_constant())
+
+    return expr
+
+def evaluate_expression(expr, x_value):
+    try:
+        stack = []
+        for token in expr:
+            if token == "X":
+                stack.append(x_value)
+            elif isinstance(token, float):
+                stack.append(token)
+            elif token in OPERATORS:
+                if len(stack) < 2:
+                    return None
+                b = stack.pop()
+                a = stack.pop()
+                if token == "+":
+                    stack.append(a + b)
+                elif token == "-":
+                    stack.append(a - b)
+                elif token == "*":
+                    stack.append(a * b)
+                elif token == "/":
+                    if b == 0:
+                        return None
+                    stack.append(a / b)
+        return stack[0] if len(stack) == 1 else None
+    except:
+        return None
+
+
+# ---------------------------------------------------------
+# MAIN DEMONSTRATION (matching your notebook)
+# ---------------------------------------------------------
+
+expr = create_initial_expression()
+print("Initial Expression:", expr)
+
+# First mutation
+expr1 = mutate_expression(expr)
+print("Mutated Expression:", expr1)
+print("Evaluated at x = 2:", evaluate_expression(expr1, 2))
+
+# Second mutation
+expr2 = mutate_expression(expr1)
+print("\nMutated Expression:", expr2)
+print("Evaluated at x = 2:", evaluate_expression(expr2, 2))
+
+# Third mutation
+expr3 = mutate_expression(expr2)
+print("\nMutated Expression:", expr3)
+print("Evaluated at x = 2:", evaluate_expression(expr3, 2))
