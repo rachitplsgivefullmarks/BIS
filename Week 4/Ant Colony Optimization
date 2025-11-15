@@ -1,0 +1,85 @@
+import random
+import numpy as np
+
+# Number of cities
+N = 8
+
+# Generate coordinates for cities (random for demo)
+coords = np.random.rand(N, 2) * 10
+
+# Distance matrix
+dist = np.zeros((N, N))
+for i in range(N):
+    for j in range(N):
+        dist[i][j] = np.linalg.norm(coords[i] - coords[j])
+
+# ACO parameters
+alpha = 1.0   # pheromone importance
+beta = 2.0    # distance importance
+rho = 0.5     # evaporation rate
+num_ants = 10
+iterations = 10
+
+# Initial pheromone
+pheromone = np.ones((N, N))
+
+def probability(i, visited):
+    probs = []
+    for j in range(N):
+        if j in visited:
+            probs.append(0)
+        else:
+            probs.append((pheromone[i][j] ** alpha) * ((1 / (dist[i][j] + 1e-6)) ** beta))
+    s = sum(probs)
+    return [p / s for p in probs]
+
+def path_length(path):
+    return sum(dist[path[i]][path[(i + 1) % N]] for i in range(N))
+
+best_path = None
+best_length = float("inf")
+
+# -----------------------------
+# MAIN ACO LOOP
+# -----------------------------
+for it in range(1, iterations + 1):
+    all_paths = []
+    all_lengths = []
+
+    for ant in range(num_ants):
+        start = random.randint(0, N - 1)
+        visited = [start]
+
+        while len(visited) < N:
+            probs = probability(visited[-1], visited)
+            next_city = random.choices(range(N), weights=probs)[0]
+            visited.append(next_city)
+
+        all_paths.append(visited)
+        L = path_length(visited)
+        all_lengths.append(L)
+
+    # Update best
+    idx = np.argmin(all_lengths)
+    if all_lengths[idx] < best_length:
+        best_length = all_lengths[idx]
+        best_path = all_paths[idx]
+
+    print(f"Iteration {it}: Best path length so far: {round(best_length, 6)}")
+
+    # Update pheromone
+    pheromone *= (1 - rho)
+    for k in range(num_ants):
+        for i in range(N):
+            a = all_paths[k][i]
+            b = all_paths[k][(i + 1) % N]
+            pheromone[a][b] += 1 / (all_lengths[k] + 1e-6)
+
+# Final Output
+print("\nFinal best path length:", round(best_length, 6))
+print("Best path with weights:")
+
+for i in range(N):
+    a = best_path[i]
+    b = best_path[(i + 1) % N]
+    print(f"{a} -> {b}  (dist = {round(dist[a][b], 3)})")
