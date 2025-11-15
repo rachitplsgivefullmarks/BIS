@@ -1,0 +1,82 @@
+# Genetic Algorithm for single-variable optimization (real-coded)
+# This code runs a GA to minimize a simple test function and prints one "best" per generation
+# in the same textual format as the notebook image.
+# You can change the function `f(x)` to any other objective you want to optimize.
+
+import random
+import math
+import statistics
+
+random.seed(42)
+
+# Objective function to minimize
+def f(x):
+    # Example: simple convex bowl with minimum near x = 1.05 and base value 2.0
+    return 2.0 + (x - 1.05)**2 * 0.9  # scale factor to make numbers similar to the image
+
+# GA parameters
+POP_SIZE = 20
+GENS = 10
+X_MIN, X_MAX = -2.0, 4.0
+TOURNAMENT_SIZE = 3
+CROSSOVER_PROB = 0.8
+MUTATION_STD = 0.05  # gaussian mutation standard deviation
+ELITISM = 1          # number of elites to carry to next generation
+
+# Initialize population (real-coded)
+population = [random.uniform(X_MIN, X_MAX) for _ in range(POP_SIZE)]
+
+def tournament_select(pop, k=TOURNAMENT_SIZE):
+    """Return one selected individual (real value) by tournament."""
+    aspirants = random.sample(pop, k)
+    aspirants.sort(key=lambda ind: f(ind))  # minimize
+    return aspirants[0]
+
+def blend_crossover(a, b, alpha=0.5):
+    """Simple blend crossover (arithmetic mix)"""
+    r = random.random()
+    child = a * r + b * (1-r)
+    return child
+
+def mutate(x, sigma=MUTATION_STD):
+    """Gaussian mutation (keeps within bounds)"""
+    x2 = x + random.gauss(0, sigma)
+    # clip to bounds
+    if x2 < X_MIN: x2 = X_MIN
+    if x2 > X_MAX: x2 = X_MAX
+    return x2
+
+# Run GA and print best per generation in the style requested
+print("Optimization log:")
+for gen in range(1, GENS+1):
+    # Evaluate and keep elite(s)
+    population.sort(key=lambda ind: f(ind))
+    elites = population[:ELITISM]
+    
+    # Logging best of current population (before reproduction)
+    best = population[0]
+    best_val = f(best)
+    print(f"Generation {gen}: Best x = {best:.5f} , f(x) = {best_val:.6f}")
+    
+    # Create new population
+    new_pop = elites.copy()
+    while len(new_pop) < POP_SIZE:
+        # selection
+        p1 = tournament_select(population)
+        p2 = tournament_select(population)
+        # crossover
+        if random.random() < CROSSOVER_PROB:
+            c = blend_crossover(p1, p2)
+        else:
+            c = p1
+        # mutation
+        c = mutate(c)
+        new_pop.append(c)
+    
+    population = new_pop
+
+# Final best
+population.sort(key=lambda ind: f(ind))
+best = population[0]
+print("\nFinal best:")
+print(f"Best x = {best:.6f} , f(x) = {f(best):.6f}")
