@@ -1,0 +1,99 @@
+#Application: Robot Path Planning
+import random
+
+# -------------------------------
+# Grid setup
+# -------------------------------
+ROWS = 20
+COLS = 30
+START = (1, 1)
+GOAL = (18, 28)
+
+# Generate simple obstacle map (mostly free)
+grid = [[0 for _ in range(COLS)] for _ in range(ROWS)]
+for _ in range(40):
+    r = random.randint(0, ROWS - 1)
+    c = random.randint(0, COLS - 1)
+    grid[r][c] = 1   # obstacle
+
+# --------------------------------
+# Fitness = proximity to goal - penalty for collisions
+# --------------------------------
+def fitness(path):
+    x, y = path[-1]
+    dist = abs(GOAL[0] - x) + abs(GOAL[1] - y)
+    penalty = 20 * sum(grid[r][c] for r, c in path if grid[r][c] == 1)
+    return -dist - penalty
+
+# --------------------------------
+# Generate random path (single agent)
+# --------------------------------
+def random_path():
+    path = [START]
+    x, y = START
+    for _ in range(60):
+        move = random.choice([(1,0),(-1,0),(0,1),(0,-1)])
+        nx, ny = x + move[0], y + move[1]
+        if 0 <= nx < ROWS and 0 <= ny < COLS:
+            path.append((nx, ny))
+            x, y = nx, ny
+    return path
+
+# --------------------------------
+# Parallel cellular update:
+# each cell copies better neighbour path
+# --------------------------------
+population = [random_path() for _ in range(40)]
+
+def evolve(pop):
+    new_pop = []
+    for i in range(len(pop)):
+        candidate = pop[i]
+        best_cand = candidate
+        # compare with random neighbour
+        for _ in range(3):
+            nb = random.choice(pop)
+            if fitness(nb) > fitness(best_cand):
+                best_cand = nb
+        # small mutation: random step change
+        new = best_cand[:]
+        if random.random() < 0.3:
+            idx = random.randint(1, len(new)-1)
+            x, y = new[idx]
+            move = random.choice([(1,0),(-1,0),(0,1),(0,-1)])
+            nx, ny = x + move[0], y + move[1]
+            if 0 <= nx < ROWS and 0 <= ny < COLS:
+                new[idx] = (nx, ny)
+        new_pop.append(new)
+    return new_pop
+
+# --------------------------------
+# MAIN LOOP
+# --------------------------------
+BEST = None
+BEST_FIT = -1e9
+
+for it in range(1, 300):
+
+    # find best in current population
+    for p in population:
+        f = fitness(p)
+        if f > BEST_FIT:
+            BEST = p
+            BEST_FIT = f
+
+    # NOTEBOOK style printing
+    if it in [1, 150, 299]:
+        print(f"Iteration {it}: Best Fitness = {round(BEST_FIT, 3)}")
+
+    population = evolve(population)
+
+# --------------------------------
+# FINAL OUTPUT
+# --------------------------------
+reached_goal = BEST[-1] == GOAL
+print("\nBest Fitness =", round(BEST_FIT, 3))
+print("Path Length =", len(BEST))
+print("Reached goal:", reached_goal)
+
+print("Best path coordinates:", BEST)
