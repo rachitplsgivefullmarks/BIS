@@ -1,0 +1,10 @@
+Iteration 1: Best Fitness = -29.420
+.
+Iteration 150: Best Fitness = -10.902
+.
+Iteration 299: Best Fitness = 53.210
+
+Best Fitness = 53.210
+Path Length = 41
+Reached goal: True
+Best path coordinates: [(1,1),(2,1),(3,1),(4,1)... (18,28)]
