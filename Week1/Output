@@ -1,0 +1,14 @@
+Optimization log:
+Generation 1: Best x = 1.03213 , f(x) = 2.000287
+Generation 2: Best x = 1.03213 , f(x) = 2.000287
+Generation 3: Best x = 1.04859 , f(x) = 2.000002
+Generation 4: Best x = 1.04859 , f(x) = 2.000002
+Generation 5: Best x = 1.05108 , f(x) = 2.000001
+Generation 6: Best x = 1.05108 , f(x) = 2.000001
+Generation 7: Best x = 1.05108 , f(x) = 2.000001
+Generation 8: Best x = 1.05108 , f(x) = 2.000001
+Generation 9: Best x = 1.05108 , f(x) = 2.000001
+Generation 10: Best x = 1.04998 , f(x) = 2.000000
+
+Final best:
+Best x = 1.049980 , f(x) = 2.000000
