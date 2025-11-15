@@ -1,1 +1,9 @@
+Initial Expression: ['X', 3.0, 7.0, '+']
+Mutated Expression: ['X', 3.0, 0.728027, '+']
+Evaluated at x = 2: None
 
+Mutated Expression: ['X', 3.0, 0.728027, '*']
+Evaluated at x = 2: -2.0
+
+Mutated Expression: ['X', 3.0, 0.728027, '-', '+']
+Evaluated at x = 2: 5.0
