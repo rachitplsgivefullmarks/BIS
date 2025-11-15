@@ -1,0 +1,115 @@
+import random
+import math
+
+# -----------------------------
+# PISTON LEVER VOLUME FUNCTION
+# -----------------------------
+# You can replace this with your real function
+def volume(H, B, D, X):
+    return (H**2) + 2*(B**2) + 3*(D**2) + 0.5*X
+
+
+# -----------------------------
+# CUCKOO SEARCH PARAMETERS
+# -----------------------------
+n = 30              # number of nests
+pa = 0.25           # discovery rate
+alpha = 0.01        # step size scaling
+lam = 1.5           # levy exponent
+max_iter = 200      # maximum iterations
+
+# Variable bounds
+LB = [0,   0,    0,    0]       # H, B, D, X lower bounds
+UB = [5,   5,    5,  150]       # upper bounds
+
+
+# -----------------------------
+# LEVY FLIGHT
+# -----------------------------
+def levy_flight(lam):
+    u = random.gauss(0, 1)
+    v = random.gauss(0, 1)
+    step = u / (abs(v)**(1/lam))
+    return step
+
+
+# -----------------------------
+# RANDOM SOLUTION WITHIN BOUNDS
+# -----------------------------
+def random_solution():
+    return [
+        random.uniform(LB[0], UB[0]),
+        random.uniform(LB[1], UB[1]),
+        random.uniform(LB[2], UB[2]),
+        random.uniform(LB[3], UB[3]),
+    ]
+
+
+# -----------------------------
+# LIMIT VARIABLES TO RANGE
+# -----------------------------
+def apply_bounds(sol):
+    for i in range(len(sol)):
+        if sol[i] < LB[i]: sol[i] = LB[i]
+        if sol[i] > UB[i]: sol[i] = UB[i]
+    return sol
+
+
+# -----------------------------
+# INITIALIZE NESTS
+# -----------------------------
+nests = [random_solution() for _ in range(n)]
+nest_fitness = [volume(*s) for s in nests]
+
+# Find the current best
+best_index = nest_fitness.index(min(nest_fitness))
+best = nests[best_index]
+best_f = nest_fitness[best_index]
+
+
+# -----------------------------
+# MAIN CUCKOO SEARCH LOOP
+# -----------------------------
+for it in range(1, max_iter + 1):
+
+    # Generate a new solution by Levy Flight
+    i = random.randint(0, n - 1)
+    new = nests[i][:]
+
+    for j in range(4):
+        new[j] += alpha * levy_flight(lam)
+
+    new = apply_bounds(new)
+    new_f = volume(*new)
+
+    # Replace if improved
+    if new_f < nest_fitness[i]:
+        nests[i] = new
+        nest_fitness[i] = new_f
+
+    # Abandon some nests (pa probability)
+    for k in range(n):
+        if random.random() < pa:
+            nests[k] = random_solution()
+            nest_fitness[k] = volume(*nests[k])
+
+    # Update the best
+    best_index = nest_fitness.index(min(nest_fitness))
+    best = nests[best_index]
+    best_f = nest_fitness[best_index]
+
+    # NOTEBOOK STYLE PRINTING
+    if it in [1, 11, 21, 31, 41, 51, 61, 71, 81, 200]:
+        print(f"Iteration {it}: Best Volume = {round(best_f, 6)}")
+
+
+# -----------------------------
+# FINAL OUTPUT LIKE NOTEBOOK
+# -----------------------------
+print("\nBest Piston Lever design found:")
+print(f"H = {round(best[0], 6)}")
+print(f"B = {round(best[1], 6)}")
+print(f"D = {round(best[2], 6)}")
+print(f"X = {round(best[3], 6)}")
+
+print(f"\nMinimum Volume = {round(best_f, 6)}")
