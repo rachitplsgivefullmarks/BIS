@@ -1,0 +1,18 @@
+Iteration 1: Best Volume = 1553833.0
+Iteration 11: Best Volume = 817361.0
+Iteration 21: Best Volume = 937499.0
+Iteration 31: Best Volume = 1172149.0
+Iteration 41: Best Volume = 1183268.0
+Iteration 51: Best Volume = 439507.1
+Iteration 61: Best Volume = 407749.313
+Iteration 71: Best Volume = 289748.585
+Iteration 81: Best Volume = 292232.8
+Iteration 200: Best Volume = 19950325.0
+
+Best piston lever design found:
+H = 0.679425
+B = 1.614567
+D = 0.1000
+X = 104.537
+
+Minimum volume = 19950325.0
