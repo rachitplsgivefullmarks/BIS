@@ -1,0 +1,7 @@
+Iteration 1/30  - Best Accuracy: 0.94 - Selected Features: 5
+Iteration 10/30 - Best Accuracy: 0.96 - Selected Features: 8
+Iteration 20/30 - Best Accuracy: 0.97 - Selected Features: 6
+Iteration 30/30 - Best Accuracy: 0.97 - Selected Features: 6
+
+Best subset: [0,1,0,0,0,0,1,0,0,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0]
+Features selected: 6
