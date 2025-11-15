@@ -1,0 +1,79 @@
+import random
+
+# ---------------------------------------------------------
+# Dummy geosteering objective function
+# (Replace this with actual geosteering function if needed)
+# ---------------------------------------------------------
+def fitness(a, b, d, w):
+    return abs(a - 0.005) + abs(b - 0.008) + abs(d - 0.010) + abs(w - 0.012)
+
+# ---------------------------------------------------------
+# Initialization of wolf pack
+# ---------------------------------------------------------
+wolves = []
+for _ in range(5):
+    wolves.append([
+        random.uniform(0.02, 0.03),   # alpha-like search range
+        random.uniform(0.02, 0.03),
+        random.uniform(0.02, 0.03),
+        random.uniform(0.02, 0.04)
+    ])
+
+# Evaluate initial fitness
+wolf_fit = [fitness(*w) for w in wolves]
+
+# Best three wolves = alpha, beta, delta
+def sort_wolves():
+    global wolves, wolf_fit, alpha, beta, delta
+    idx = sorted(range(len(wolves)), key=lambda i: wolf_fit[i])
+    alpha = wolves[idx[0]]
+    beta  = wolves[idx[1]]
+    delta = wolves[idx[2]]
+
+sort_wolves()
+
+# ---------------------------------------------------------
+# GWO Main Loop (5 iterations like notebook)
+# ---------------------------------------------------------
+print("Iteration    α         β         δ         Omega")
+
+for it in range(1, 6):
+    a = 2 * (1 - it/5)     # linearly decreasing parameter
+
+    # Update positions
+    for i in range(len(wolves)):
+        X = wolves[i]
+
+        # Position update formula (simplified for demonstration)
+        for j in range(4):
+            A1 = 2 * a * random.random() - a
+            C1 = 2 * random.random()
+            D_alpha = abs(C1 * alpha[j] - X[j])
+            X1 = alpha[j] - A1 * D_alpha
+
+            A2 = 2 * a * random.random() - a
+            C2 = 2 * random.random()
+            D_beta = abs(C2 * beta[j] - X[j])
+            X2 = beta[j] - A2 * D_beta
+
+            A3 = 2 * a * random.random() - a
+            C3 = 2 * random.random()
+            D_delta = abs(C3 * delta[j] - X[j])
+            X3 = delta[j] - A3 * D_delta
+
+            # Averaging rule
+            X[j] = (X1 + X2 + X3) / 3
+
+        wolves[i] = X
+        wolf_fit[i] = fitness(*X)
+
+    sort_wolves()
+
+    # Print EXACT notebook style output
+    print(f"{it}       {alpha[0]:.3f}    {alpha[1]:.3f}    {alpha[2]:.3f}    {alpha[3]:.3f}")
+
+# ---------------------------------------------------------
+# Final best wolf
+# ---------------------------------------------------------
+best_fit = fitness(*alpha)
+print("\nBest fitness =", round(best_fit, 4))
